@@ -11,12 +11,11 @@ from scipy.signal import find_peaks
 import math
 import numpy as np
 from tqdm import tqdm
-from BittiumTrainSetBuilder import *
 from Utils import *
 
 class RDetector(nn.Module):
 
-    def __init__(self, name='Weights_Bittium_I'):
+    def __init__(self, name='Weights_Bittium_I', device='cuda:0'):
 
         super(RDetector, self).__init__()
 
@@ -35,6 +34,7 @@ class RDetector(nn.Module):
         self.max_total_len = 70000       # Max sequence len for annotations
         self.dropout_val = 0.3
         self.normalize = False       # Normalize signal in input
+        self.device = device
 
         # Peaks detection treshold: proportion of max value
         self.peaks_treshold = 0.1
@@ -134,9 +134,6 @@ class RDetector(nn.Module):
         out = self.re3(self.dec_fc3(out))
         out = torch.sigmoid(self.dec_fc4(out))
 
-        # Reshape to match original
-        #out = self.sm(torch.reshape(out, (-1, beat_size, 2)))
-
         return out
 
     def save(self, epoch=None):
@@ -163,8 +160,6 @@ class RDetector(nn.Module):
         reading_max_len = 5000
         # Store result signal
         results = []
-
-
 
         # Read all the signal step by step
         idx = 0
@@ -209,13 +204,14 @@ class RDetector(nn.Module):
 
         return opt
 
-    def annot_peaks(self, signals, device='cuda:0', pre_trait=True):
+    def annot_peaks(self, signals, device=None, pre_trait=True):
         """
         R peaks annotation
         :param signals: 2D array: first dim = signal index
         :return: R confidence signal, r wave index's
         """
-
+        if device is None:
+            device = self.device
         # First get annotation signal values
         annot_sign = self.annot_multi_signal(signals, device=device, pre_trait=pre_trait)
 
@@ -247,17 +243,7 @@ class RDetector(nn.Module):
         # Do the max prediction:
         sm = np.max(preds, axis=0)
 
-        # Smooth predictions
-        #sm = own_NRMAS(sm, window=51)
-
         return sm
-
-
-
-
-
-
-
 
 class SelfAttention(nn.Module):
     """
