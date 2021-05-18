@@ -17,6 +17,7 @@ def read_file(path):
 
 def read_mit(path):
 
+    print('MIT file opening...')
     file_path = path.replace('.hea', '')
     signal = wfdb.rdrecord(file_path)
     signal = signal.p_signal.T
@@ -27,6 +28,7 @@ def read_mit(path):
 
 def read_edf(path):
 
+    print('EDF file opening...')
     signal, _, _ = pyedflib.highlevel.read_edf(path)
     return signal
 
