@@ -37,4 +37,5 @@ on the large quantity of recording form the CHU. Theses records where previously
   This step was done using our implementation BittiumPreparator.py in the DataPreparator folder.
 
 
-![EDF]("FINAL_MODEL/figs/EDF_Browser_demo.PNG")
+
+
